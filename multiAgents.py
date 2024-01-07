@@ -16,7 +16,7 @@ from util import manhattanDistance
 from game import Directions
 import random, util
 import math
-
+import random
 from game import Agent
 from pacman import GameState
 
@@ -45,9 +45,12 @@ class AIAgent(MultiAgentSearchAgent):
             bestValue = -math.inf
             worst = math.inf
             EF = self.evaluationFunction(gameState)
+            q = -1
             for action in legalActions:
                 value = minimax_value(gameState.generateSuccessor(0, action), 1, 0, bestValue, worst)
                 print(action, value)
+                if value != bestValue:
+                    q += 1
                 for i in range(0, 5):
                     if i == 0:
                         V = value
@@ -55,12 +58,20 @@ class AIAgent(MultiAgentSearchAgent):
                     else:
                         V = minimax_value(gameState.generateSuccessor(0, action), 1, i, bestValue, worst)
                         BV = minimax_value(gameState.generateSuccessor(0, bestAction), 1, i, bestValue, worst)
+                    if V == BV:
+                        if bestAction == 'Stop':
+                            bestValue = value
+                            bestAction = action
+                            break
                     if V > BV:
                         bestValue = value
                         bestAction = action
-                        print(i)
                         break
             
+            while q < 1 and value < EF:
+                bestAction = random.choice(gameState.getLegalActions(0))
+                if bestAction != 'Stop':
+                    break
             print(bestAction)
             return bestAction
 
