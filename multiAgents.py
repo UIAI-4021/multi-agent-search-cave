@@ -43,33 +43,53 @@ class AIAgent(MultiAgentSearchAgent):
             legalActions = gameState.getLegalActions(0)
             bestAction = None
             bestValue = -math.inf
+            worst = math.inf
+            EF = self.evaluationFunction(gameState)
             for action in legalActions:
-                value = minimax_value(gameState.generateSuccessor(0, action), 1, 0)
-                if value > bestValue:
-                    bestValue = value
-                    bestAction = action
+                value = minimax_value(gameState.generateSuccessor(0, action), 1, 0, bestValue, worst)
+                print(action, value)
+                for i in range(0, 5):
+                    if i == 0:
+                        V = value
+                        BV = bestValue
+                    else:
+                        V = minimax_value(gameState.generateSuccessor(0, action), 1, i, bestValue, worst)
+                        BV = minimax_value(gameState.generateSuccessor(0, bestAction), 1, i, bestValue, worst)
+                    if V > BV:
+                        bestValue = value
+                        bestAction = action
+                        print(i)
+                        break
+            
+            print(bestAction)
             return bestAction
 
-        def minimax_value(gameState, agentIndex, depth):
-            if gameState.isWin() or gameState.isLose() or depth == 2:
+        def minimax_value(gameState, agentIndex, depth, bestsofar, worst):
+            if gameState.isLose():
+                return -20000
+            if gameState.isWin():
+                return 20000
+            if depth == self.depth:
                 return self.evaluationFunction(gameState)
-
             if agentIndex == 0:
-                return max_value(gameState, agentIndex, depth)
-            else:
-                return min_value(gameState, agentIndex, depth)
+                return max_value(gameState, agentIndex, depth, worst)
+            return min_value(gameState, agentIndex, depth, bestsofar)
 
-        def max_value(gameState, agentIndex, depth):
+        def max_value(gameState, agentIndex, depth, worst):
             v = -math.inf
             legalActions = gameState.getLegalActions(agentIndex)
             for action in legalActions:
-                v = max(v, minimax_value(gameState.generateSuccessor(agentIndex, action), (agentIndex + 1) % gameState.getNumAgents(), depth + 1))
+                v = max(v, minimax_value(gameState.generateSuccessor(agentIndex, action), (agentIndex + 1) % gameState.getNumAgents(), depth + 1, v, worst))
+                if v >= worst:
+                    return v
             return v
 
-        def min_value(gameState, agentIndex, depth):
+        def min_value(gameState, agentIndex, depth, bestsofar):
             v = math.inf
             legalActions = gameState.getLegalActions(agentIndex)
             for action in legalActions:
-                v = min(v, minimax_value(gameState.generateSuccessor(agentIndex, action), (agentIndex + 1) % gameState.getNumAgents(), depth))
+                v = min(v, minimax_value(gameState.generateSuccessor(agentIndex, action), (agentIndex + 1) % gameState.getNumAgents(), depth, bestsofar, v))
+                if v <= bestsofar:
+                    return v
             return v
         return minimax_decision(gameState)
