@@ -51,8 +51,8 @@ class AIAgent(MultiAgentSearchAgent):
             return bestAction
 
         def minimax_value(gameState, agentIndex, depth):
-            if gameState.isWin() or gameState.isLose() or depth == 4:
-                return self.evaluationFunction
+            if gameState.isWin() or gameState.isLose() or depth == 2:
+                return self.evaluationFunction(gameState)
 
             if agentIndex == 0:
                 return max_value(gameState, agentIndex, depth)
