@@ -58,14 +58,10 @@ class AIAgent(MultiAgentSearchAgent):
                     else:
                         V = minimax_value(gameState.generateSuccessor(0, action), 1, i, bestValue, worst)
                         BV = minimax_value(gameState.generateSuccessor(0, bestAction), 1, i, bestValue, worst)
-                    if V == BV:
-                        if bestAction == 'Stop':
+                    if V != BV:
+                        if V > BV:
                             bestValue = value
                             bestAction = action
-                            break
-                    if V > BV:
-                        bestValue = value
-                        bestAction = action
                         break
             
             while q < 1 and value < EF:
