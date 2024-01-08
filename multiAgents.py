@@ -39,7 +39,12 @@ class MultiAgentSearchAgent(Agent):
         self.depth = int(depth)
         self.time_limit = int(time_limit)
 class AIAgent(MultiAgentSearchAgent):
+    States = []
+    n = 0
     def getAction(self, gameState: GameState):
+        self.n = 0
+        def toINT(L):
+            return L[0] * 10 + L[1]
         def minimax_decision(gameState):
             Start = time.time()
             legalActions = gameState.getLegalActions(0)
@@ -94,10 +99,16 @@ class AIAgent(MultiAgentSearchAgent):
                             bestAction = action
                         break
             if q:
-                print('Random action picked')
-                bestAction = random.choice(legalActions)
-            print('chosenAction:', bestAction)
-            print(time.time() - Start)
+                for action in legalActions:
+                    self.States.append(toINT(gameState.getPacmanPosition()))
+                    nextState = toINT(gameState.generateSuccessor(0, action).getPacmanPosition())
+                    if nextState in self.States:
+                        print('continued')
+                        continue
+                    else:
+                        bestAction = action
+                        break
+            print(time.time() - Start, '\n \n')
             return bestAction
 
         def minimax_value(gameState, agentIndex, depth, bestsofar, worst):
