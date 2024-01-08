@@ -49,26 +49,35 @@ class AIAgent(MultiAgentSearchAgent):
             worst = math.inf
             EF = self.evaluationFunction(gameState)
             q = True
-            v = [4, 1]
-            bv = [4, 1]
+            v = [0, 0, 0]
+            bv = [0, 0, 0]
             for action in legalActions:
-                v[0] = minimax_value(gameState.generateSuccessor(0, action), 1, 3, bestValue, worst)
-                v[1] = minimax_value(gameState.generateSuccessor(0, action), 1, 4, bestValue, worst)
-                if(v[0] - EF == 8 and v[1] - EF == 9):
+                v[0] = minimax_value(gameState.generateSuccessor(0, action), 1, 2, bestValue, worst)
+                v[1] = minimax_value(gameState.generateSuccessor(0, action), 1, 3, bestValue, worst)
+                v[2] = minimax_value(gameState.generateSuccessor(0, action), 1, 4, bestValue, worst)
+                if(v[1] - EF == 8 and v[2] - EF == 9):
+                    bestAction = action
+                    q = False
+                    break
+                if(v[0] - EF == 7 and v[1] - EF == 8 and v[2] - EF == -1):
+                    bestAction = action
+                    q = False
+                    break
+                if(v[0] - EF == 17 and v[1] - EF == 18):
                     bestAction = action
                     q = False
                     break
                 value = minimax_value(gameState.generateSuccessor(0, action), 1, 0, bestValue, worst)
-                if value > EF:
+                if value != EF - 5:
                     q = False
                     
-                print(action, value)
+                print('each legal action with its values:', action, value)
 
                 for i in range(5):
                     if i:
-                        if i > 2:
-                            V = v[i - 3]
-                            BV = bv[i - 3]
+                        if i > 1:
+                            V = v[i - 2]
+                            BV = bv[i - 2]
                         else:
                             V = minimax_value(gameState.generateSuccessor(0, action), 1, i, bestValue, worst)
                             BV = minimax_value(gameState.generateSuccessor(0, bestAction), 1, i, bestValue, worst)
@@ -79,24 +88,23 @@ class AIAgent(MultiAgentSearchAgent):
 
                     if V != BV:
                         if V > BV:
-                            print('Changed')
+                            print('best Value Updated')
                             bestValue = value
-                            bv[0] = v[0]
-                            bv[1] = v[1]
+                            bv = v
                             bestAction = action
                         break
             if q:
-                print('random')
+                print('Random action picked')
                 bestAction = random.choice(legalActions)
-            print(bestAction)
+            print('chosenAction:', bestAction)
             print(time.time() - Start)
             return bestAction
 
         def minimax_value(gameState, agentIndex, depth, bestsofar, worst):
             if gameState.isLose():
-                return -20000
+                return self.evaluationFunction(gameState) - 2000
             if gameState.isWin():
-                return 20000
+                return self.evaluationFunction(gameState) + 2000
             if depth == self.depth:
                 return self.evaluationFunction(gameState)
             if agentIndex == 0:
