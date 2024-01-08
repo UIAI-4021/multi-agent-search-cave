@@ -99,6 +99,7 @@ class AIAgent(MultiAgentSearchAgent):
                             bestAction = action
                         break
             if q:
+                p = True
                 for action in legalActions:
                     self.States.append(toINT(gameState.getPacmanPosition()))
                     nextState = toINT(gameState.generateSuccessor(0, action).getPacmanPosition())
@@ -106,8 +107,11 @@ class AIAgent(MultiAgentSearchAgent):
                         print('continued')
                         continue
                     else:
+                        p = False
                         bestAction = action
                         break
+                if p:
+                    bestAction = random.choice(legalActions)
             print(time.time() - Start, '\n \n')
             return bestAction
 
