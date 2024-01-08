@@ -39,35 +39,58 @@ class MultiAgentSearchAgent(Agent):
         self.time_limit = int(time_limit)
 class AIAgent(MultiAgentSearchAgent):
     def getAction(self, gameState: GameState):
+        def greed(action, bestAction, EF):
+            BV3 = minimax_value(gameState.generateSuccessor(0, bestAction), 1, 3, -20000, 20000)
+            V3 = minimax_value(gameState.generateSuccessor(0, action), 1, 3, -20000, 20000)
+            V4 = minimax_value(gameState.generateSuccessor(0, action), 1, 4, -20000, 20000) - 5
+            BV4 = minimax_value(gameState.generateSuccessor(0, action), 1, 4, -20000, 20000) - 5
+            EF -= 2
+            print(V3, BV3, EF, V4, BV4)
+            if BV3 + EF == 2 * V3 and V4 > EF:
+                print('111111111111111111111111111111')
+                return 1
+            if V3 + EF == 2 * BV3 and BV4 > EF:
+                print('222222222222222222222222222222')
+                return 2
+            return 0
+
         def minimax_decision(gameState):
             legalActions = gameState.getLegalActions(0)
+            legalActions.remove('Stop')
             bestAction = None
             bestValue = -math.inf
             worst = math.inf
             EF = self.evaluationFunction(gameState)
-            q = -1
+            q = True
             for action in legalActions:
                 value = minimax_value(gameState.generateSuccessor(0, action), 1, 0, bestValue, worst)
+                if value > EF:
+                    q = False
                 print(action, value)
-                if value != bestValue:
-                    q += 1
-                for i in range(0, 5):
-                    if i == 0:
-                        V = value
-                        BV = bestValue
-                    else:
+                for i in range(5):
+                    if i:
                         V = minimax_value(gameState.generateSuccessor(0, action), 1, i, bestValue, worst)
                         BV = minimax_value(gameState.generateSuccessor(0, bestAction), 1, i, bestValue, worst)
+                        print(action, V, bestAction, BV)
+                    else:
+                        V = value
+                        BV = bestValue
                     if V != BV:
                         if V > BV:
+                            print('Changed')
                             bestValue = value
                             bestAction = action
                         break
-            
-            while q < 1 and value < EF:
-                bestAction = random.choice(gameState.getLegalActions(0))
-                if bestAction != 'Stop':
-                    break
+                # if bestAction != None:
+                #     g = greed(action, bestAction, EF)
+                #     if g > 0:
+                #         if g == 1:
+                #             bestValue = value
+                #             bestAction = action
+                #         break
+            if q:
+                print('random')
+                bestAction = random.choice(legalActions)
             print(bestAction)
             return bestAction
 
